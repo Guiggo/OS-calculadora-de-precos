@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de Orçamento — Mudanças</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Calculadora de Orçamento de Mudanças</h1>
+    <p class="subtitle">Preencha os dados — o orçamento recalcula automaticamente.</p>
+  </header>
+
+  <main class="layout">
+    <form id="form" class="form" autocomplete="off">
+      <details open>
+        <summary>Dados Gerais</summary>
+        <fieldset>
+          <label>Distância (km)
+            <input type="number" id="D" min="0" step="0.1" value="20" required />
+          </label>
+          <label>Custo por km (R$/km)
+            <input type="number" id="CD" min="0" step="0.01" value="3.00" />
+          </label>
+          <label>Volume da mudança (m³)
+            <input type="number" id="V" min="0" step="0.1" value="25" required />
+            <small>Volume não entra no preço — serve apenas para dimensionar caminhão e ajudantes.</small>
+          </label>
+        </fieldset>
+      </details>
+
+      <details open>
+        <summary>Caminhão</summary>
+        <fieldset>
+          <p class="hint">Faixas editáveis. O caminhão é sugerido automaticamente pelo volume.</p>
+          <table class="trucks" id="trucks">
+            <thead>
+              <tr><th>Nome</th><th>Vol. máx (m³)</th><th>TB (R$)</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" value="VUC" data-truck="nome" /></td>
+                <td><input type="number" min="0" step="0.1" value="15" data-truck="volMax" /></td>
+                <td><input type="number" min="0" step="1" value="300" data-truck="tb" /></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="Toco" data-truck="nome" /></td>
+                <td><input type="number" min="0" step="0.1" value="30" data-truck="volMax" /></td>
+                <td><input type="number" min="0" step="1" value="500" data-truck="tb" /></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="Truck" data-truck="nome" /></td>
+                <td><input type="number" min="0" step="0.1" value="60" data-truck="volMax" /></td>
+                <td><input type="number" min="0" step="1" value="800" data-truck="tb" /></td>
+              </tr>
+            </tbody>
+          </table>
+          <label>Caminhão selecionado
+            <select id="truckSelect">
+              <option value="auto" selected>Automático (seguir volume)</option>
+            </select>
+          </label>
+        </fieldset>
+      </details>
+
+      <details open>
+        <summary>Mão de Obra</summary>
+        <fieldset>
+          <div class="row">
+            <label>Tipo de contratação
+              <select id="tipoContratacao">
+                <option value="terceirizado" selected>Terceirizado</option>
+                <option value="clt">CLT</option>
+              </select>
+            </label>
+            <label>Duração (dias)
+              <input type="number" id="dias" min="1" step="1" value="2" required />
+            </label>
+          </div>
+          <div class="row">
+            <label>Nº de motoristas
+              <input type="number" id="nMotoristas" min="0" step="1" value="1" required />
+            </label>
+            <label>Nº de ajudantes
+              <input type="number" id="nAjudantes" min="0" step="1" value="2" />
+            </label>
+          </div>
+          <label class="checkbox">
+            <input type="checkbox" id="ajudantesAuto" checked />
+            Sugerir ajudantes automaticamente pelo volume
+          </label>
+          <div class="row">
+            <label>Mínimo de ajudantes
+              <input type="number" id="minAjudantes" min="0" step="1" value="2" />
+            </label>
+            <label>Passo (m³ por ajudante extra)
+              <input type="number" id="passoAjudantes" min="1" step="1" value="8" />
+            </label>
+          </div>
+
+          <details>
+            <summary>Custos detalhados (editáveis)</summary>
+            <div class="row">
+              <label>Salário motorista (CLT)
+                <input type="number" id="salarioMotorista" min="0" step="1" value="3000" />
+              </label>
+              <label>Salário ajudante (CLT)
+                <input type="number" id="salarioAjudante" min="0" step="1" value="2000" />
+              </label>
+            </div>
+            <div class="row">
+              <label>Multiplicador de encargos
+                <input type="number" id="multiplicadorEncargos" min="1" step="0.01" value="1.70" />
+              </label>
+              <label>Dias úteis/mês (CLT)
+                <input type="number" id="diasUteisMes" min="1" step="1" value="22" />
+              </label>
+            </div>
+            <div class="row">
+              <label>Diária motorista (Terceirizado)
+                <input type="number" id="diariaMotorista" min="0" step="1" value="220" />
+              </label>
+              <label>Diária ajudante (Terceirizado)
+                <input type="number" id="diariaAjudante" min="0" step="1" value="180" />
+              </label>
+            </div>
+          </details>
+        </fieldset>
+      </details>
+
+      <details>
+        <summary>Adicionais</summary>
+        <fieldset>
+          <div class="row">
+            <label>Içamento (R$)
+              <input type="number" id="icamento" min="0" step="1" value="0" />
+            </label>
+            <label>Desmontagem/Montagem (R$)
+              <input type="number" id="desmontagem" min="0" step="1" value="0" />
+            </label>
+          </div>
+          <div class="row">
+            <label>Embalagem (R$)
+              <input type="number" id="embalagem" min="0" step="1" value="0" />
+            </label>
+            <label>Itens especiais (R$)
+              <input type="number" id="itensEspeciais" min="0" step="1" value="0" />
+            </label>
+          </div>
+          <div class="row">
+            <label>Andares sem elevador
+              <input type="number" id="andares" min="0" step="1" value="0" />
+            </label>
+            <label>Acréscimo por andar (%)
+              <input type="number" id="percAndar" min="0" step="0.1" value="7" />
+            </label>
+          </div>
+        </fieldset>
+      </details>
+
+      <details>
+        <summary>Seguro</summary>
+        <fieldset>
+          <div class="row">
+            <label>Valor declarado da carga (R$)
+              <input type="number" id="VD" min="0" step="1" value="50000" />
+            </label>
+            <label>Taxa de seguro (%)
+              <input type="number" id="S" min="0" step="0.01" value="1" />
+            </label>
+          </div>
+        </fieldset>
+      </details>
+
+      <details open>
+        <summary>Margem de Lucro</summary>
+        <fieldset>
+          <label>Margem (%)
+            <input type="number" id="margem" min="0" step="0.1" value="25" />
+          </label>
+        </fieldset>
+      </details>
+
+      <div class="actions no-print">
+        <button type="button" id="imprimir">Imprimir / Exportar PDF</button>
+        <button type="reset" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <aside class="result" id="result" aria-live="polite">
+      <div class="receipt">
+        <header class="receipt-head">
+          <h2>Orçamento de Mudança</h2>
+          <p class="receipt-date" id="receiptDate"></p>
+        </header>
+
+        <p class="dimensionamento">
+          <strong>Caminhão sugerido:</strong> <span id="outTruck">—</span><br/>
+          <strong>Ajudantes sugeridos:</strong> <span id="outAjudantesSugeridos">—</span>
+        </p>
+
+        <dl class="lines">
+          <dt>Taxa base (caminhão)</dt>
+          <dd id="outTB">R$ 0,00</dd>
+
+          <dt id="lblDeslocamento">Deslocamento</dt>
+          <dd id="outDeslocamento">R$ 0,00</dd>
+
+          <dt>Mão de obra</dt>
+          <dd id="outCMO">R$ 0,00</dd>
+        </dl>
+        <ul class="breakdown">
+          <li id="breakMotoristas">—</li>
+          <li id="breakAjudantes">—</li>
+        </ul>
+
+        <dl class="lines">
+          <dt>Adicionais</dt>
+          <dd id="outAdicionais">R$ 0,00</dd>
+        </dl>
+        <ul class="breakdown" id="breakAdicionais"></ul>
+
+        <dl class="lines">
+          <dt id="lblSeguro">Seguro</dt>
+          <dd id="outSeguro">R$ 0,00</dd>
+        </dl>
+
+        <hr />
+
+        <dl class="lines">
+          <dt>Subtotal</dt>
+          <dd id="outSubtotal">R$ 0,00</dd>
+
+          <dt id="lblMargem">Margem</dt>
+          <dd id="outMargem">R$ 0,00</dd>
+        </dl>
+
+        <hr />
+
+        <dl class="lines total">
+          <dt>Preço final</dt>
+          <dd id="outFinal">R$ 0,00</dd>
+        </dl>
+
+        <p class="reference">
+          <strong>Preço por m³ (referência):</strong> <span id="outPorM3">—</span>
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
