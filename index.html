@@ -9,7 +9,7 @@
 <body>
   <header class="app-header">
     <h1>Calculadora de Orçamento de Mudanças</h1>
-    <p class="subtitle">Preencha os dados — o orçamento recalcula automaticamente.</p>
+    <p class="subtitle">Modelo baseado no manual tarifário — recalcula automaticamente.</p>
   </header>
 
   <main class="layout">
@@ -17,42 +17,79 @@
       <details open>
         <summary>Dados Gerais</summary>
         <fieldset>
-          <label>Distância (km)
-            <input type="number" id="D" min="0" step="0.1" value="20" required />
-          </label>
-          <label>Custo por km (R$/km)
-            <input type="number" id="CD" min="0" step="0.01" value="3.00" />
-          </label>
-          <label>Volume da mudança (m³)
-            <input type="number" id="V" min="0" step="0.1" value="25" required />
-            <small>Volume não entra no preço — serve apenas para dimensionar caminhão e ajudantes.</small>
-          </label>
+          <div class="row">
+            <label>Distância (km)
+              <input type="number" id="D" min="0" step="1" value="20" required />
+            </label>
+            <label>Volume da mudança (m³)
+              <input type="number" id="V" min="0" step="0.1" value="25" required />
+            </label>
+          </div>
+          <div class="row">
+            <label>Duração do serviço (dias)
+              <input type="number" id="dias" min="1" step="1" value="1" required />
+            </label>
+            <label>Valor da mercadoria / carga (R$)
+              <input type="number" id="VD" min="0" step="1" value="50000" />
+              <small>Usado para GRIS e seguro.</small>
+            </label>
+          </div>
+          <div class="row">
+            <label>Modo
+              <select id="modo">
+                <option value="local" selected>Local (ISS)</option>
+                <option value="inter">Intermunicipal (ICMS)</option>
+              </select>
+            </label>
+            <label>&nbsp;<span class="readonly-info" id="modoResumo"></span></label>
+          </div>
         </fieldset>
       </details>
 
       <details open>
-        <summary>Caminhão</summary>
+        <summary>Caminhão (sugerido pelo volume, editável)</summary>
         <fieldset>
-          <p class="hint">Faixas editáveis. O caminhão é sugerido automaticamente pelo volume.</p>
+          <p class="hint">Cada linha: até quantos m³ o caminhão comporta, diária parada (veículo + motorista) e custo por km. Valores extraídos do manual tarifário — edite se os seus forem diferentes.</p>
           <table class="trucks" id="trucks">
             <thead>
-              <tr><th>Nome</th><th>Vol. máx (m³)</th><th>TB (R$)</th></tr>
+              <tr><th>Nome</th><th>Vol. máx (m³)</th><th>Diária parada (R$)</th><th>Custo/km (R$)</th></tr>
             </thead>
             <tbody>
               <tr>
                 <td><input type="text" value="VUC" data-truck="nome" /></td>
                 <td><input type="number" min="0" step="0.1" value="15" data-truck="volMax" /></td>
-                <td><input type="number" min="0" step="1" value="300" data-truck="tb" /></td>
+                <td><input type="number" min="0" step="0.01" value="350.74" data-truck="diariaParada" /></td>
+                <td><input type="number" min="0" step="0.01" value="1.47" data-truck="custoKm" /></td>
               </tr>
               <tr>
-                <td><input type="text" value="Toco" data-truck="nome" /></td>
+                <td><input type="text" value="TOCO 3/4" data-truck="nome" /></td>
                 <td><input type="number" min="0" step="0.1" value="30" data-truck="volMax" /></td>
-                <td><input type="number" min="0" step="1" value="500" data-truck="tb" /></td>
+                <td><input type="number" min="0" step="0.01" value="403.73" data-truck="diariaParada" /></td>
+                <td><input type="number" min="0" step="0.01" value="1.59" data-truck="custoKm" /></td>
               </tr>
               <tr>
-                <td><input type="text" value="Truck" data-truck="nome" /></td>
+                <td><input type="text" value="TOCO" data-truck="nome" /></td>
+                <td><input type="number" min="0" step="0.1" value="45" data-truck="volMax" /></td>
+                <td><input type="number" min="0" step="0.01" value="372.16" data-truck="diariaParada" /></td>
+                <td><input type="number" min="0" step="0.01" value="1.84" data-truck="custoKm" /></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="TOCO (60)" data-truck="nome" /></td>
                 <td><input type="number" min="0" step="0.1" value="60" data-truck="volMax" /></td>
-                <td><input type="number" min="0" step="1" value="800" data-truck="tb" /></td>
+                <td><input type="number" min="0" step="0.01" value="372.16" data-truck="diariaParada" /></td>
+                <td><input type="number" min="0" step="0.01" value="1.84" data-truck="custoKm" /></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="TRUCK" data-truck="nome" /></td>
+                <td><input type="number" min="0" step="0.1" value="75" data-truck="volMax" /></td>
+                <td><input type="number" min="0" step="0.01" value="500.96" data-truck="diariaParada" /></td>
+                <td><input type="number" min="0" step="0.01" value="2.20" data-truck="custoKm" /></td>
+              </tr>
+              <tr>
+                <td><input type="text" value="CARRETA" data-truck="nome" /></td>
+                <td><input type="number" min="0" step="0.1" value="90" data-truck="volMax" /></td>
+                <td><input type="number" min="0" step="0.01" value="508.64" data-truck="diariaParada" /></td>
+                <td><input type="number" min="0" step="0.01" value="2.51" data-truck="custoKm" /></td>
               </tr>
             </tbody>
           </table>
@@ -65,25 +102,14 @@
       </details>
 
       <details open>
-        <summary>Mão de Obra</summary>
+        <summary>Equipe de Entrega (ajudantes)</summary>
         <fieldset>
           <div class="row">
-            <label>Tipo de contratação
-              <select id="tipoContratacao">
-                <option value="terceirizado" selected>Terceirizado</option>
-                <option value="clt">CLT</option>
-              </select>
-            </label>
-            <label>Duração (dias)
-              <input type="number" id="dias" min="1" step="1" value="2" required />
-            </label>
-          </div>
-          <div class="row">
-            <label>Nº de motoristas
-              <input type="number" id="nMotoristas" min="0" step="1" value="1" required />
-            </label>
             <label>Nº de ajudantes
               <input type="number" id="nAjudantes" min="0" step="1" value="2" />
+            </label>
+            <label>Diária por ajudante (R$)
+              <input type="number" id="diariaAjudante" min="0" step="1" value="160" />
             </label>
           </div>
           <label class="checkbox">
@@ -95,37 +121,52 @@
               <input type="number" id="minAjudantes" min="0" step="1" value="2" />
             </label>
             <label>Passo (m³ por ajudante extra)
-              <input type="number" id="passoAjudantes" min="1" step="1" value="8" />
+              <input type="number" id="passoAjudantes" min="1" step="1" value="15" />
             </label>
           </div>
+        </fieldset>
+      </details>
 
-          <details>
-            <summary>Custos detalhados (editáveis)</summary>
-            <div class="row">
-              <label>Salário motorista (CLT)
-                <input type="number" id="salarioMotorista" min="0" step="1" value="3000" />
-              </label>
-              <label>Salário ajudante (CLT)
-                <input type="number" id="salarioAjudante" min="0" step="1" value="2000" />
-              </label>
-            </div>
-            <div class="row">
-              <label>Multiplicador de encargos
-                <input type="number" id="multiplicadorEncargos" min="1" step="0.01" value="1.70" />
-              </label>
-              <label>Dias úteis/mês (CLT)
-                <input type="number" id="diasUteisMes" min="1" step="1" value="22" />
-              </label>
-            </div>
-            <div class="row">
-              <label>Diária motorista (Terceirizado)
-                <input type="number" id="diariaMotorista" min="0" step="1" value="220" />
-              </label>
-              <label>Diária ajudante (Terceirizado)
-                <input type="number" id="diariaAjudante" min="0" step="1" value="180" />
-              </label>
-            </div>
-          </details>
+      <details>
+        <summary>Embalagem antecipada (opcional)</summary>
+        <fieldset>
+          <label class="checkbox">
+            <input type="checkbox" id="embalagemAtiva" />
+            Incluir serviço de embalagem antecipada
+          </label>
+          <div class="row">
+            <label>Nº de dias de embalagem
+              <input type="number" id="diasEmbalagem" min="0" step="1" value="1" />
+            </label>
+            <label>Nº de Chefes de Equipe
+              <input type="number" id="nChefes" min="0" step="1" value="1" />
+            </label>
+          </div>
+          <div class="row">
+            <label>Nº de Embaladores
+              <input type="number" id="nEmbaladores" min="0" step="1" value="3" />
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="embaladoresAuto" checked />
+              Sugerir automaticamente pelo volume
+            </label>
+          </div>
+          <div class="row">
+            <label>Diária Chefe de Equipe (R$)
+              <input type="number" id="diariaChefe" min="0" step="0.01" value="173.87" />
+            </label>
+            <label>Diária Embalador (R$)
+              <input type="number" id="diariaEmbalador" min="0" step="0.01" value="154.26" />
+            </label>
+          </div>
+          <label>Material de embalagem (R$)
+            <input type="number" id="materialEmbalagem" min="0" step="1" value="654" />
+            <small>Sugerido por volume. Padrão: 654 (15m³) · 1.305 (30) · 1.984 (45) · 2.570 (60) · 2.898 (75) · 3.750 (90).</small>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="materialAuto" checked />
+            Atualizar material automaticamente pelo volume
+          </label>
         </fieldset>
       </details>
 
@@ -141,11 +182,11 @@
             </label>
           </div>
           <div class="row">
-            <label>Embalagem (R$)
-              <input type="number" id="embalagem" min="0" step="1" value="0" />
-            </label>
             <label>Itens especiais (R$)
               <input type="number" id="itensEspeciais" min="0" step="1" value="0" />
+            </label>
+            <label>Outros (R$)
+              <input type="number" id="outros" min="0" step="1" value="0" />
             </label>
           </div>
           <div class="row">
@@ -160,25 +201,49 @@
       </details>
 
       <details>
-        <summary>Seguro</summary>
+        <summary>Seguro e GRIS</summary>
         <fieldset>
           <div class="row">
-            <label>Valor declarado da carga (R$)
-              <input type="number" id="VD" min="0" step="1" value="50000" />
-            </label>
             <label>Taxa de seguro (%)
-              <input type="number" id="S" min="0" step="0.01" value="1" />
+              <input type="number" id="S" min="0" step="0.01" value="2" />
+            </label>
+            <label>GRIS — Gerenciamento de Risco (%)
+              <input type="number" id="gris" min="0" step="0.01" value="0.3" />
             </label>
           </div>
+          <small>Ambos incidem sobre o Valor da mercadoria informado em "Dados Gerais".</small>
         </fieldset>
       </details>
 
       <details open>
-        <summary>Margem de Lucro</summary>
+        <summary>Markup (composição de preço)</summary>
         <fieldset>
-          <label>Margem (%)
-            <input type="number" id="margem" min="0" step="0.1" value="25" />
-          </label>
+          <p class="hint">O preço final é calculado dividindo o custo total pelo fator (1 − soma dos percentuais). Isso garante que o lucro declarado seja real, já considerando impostos sobre a venda.</p>
+          <div class="row">
+            <label>Taxa administrativa (%)
+              <input type="number" id="mkAdmin" min="0" step="0.01" value="20" />
+            </label>
+            <label>Comissões (%)
+              <input type="number" id="mkComissao" min="0" step="0.01" value="3" />
+            </label>
+          </div>
+          <div class="row">
+            <label>Impostos federais + INSS (%)
+              <input type="number" id="mkImpostos" min="0" step="0.01" value="8.23" />
+            </label>
+            <label>Lucro (%)
+              <input type="number" id="mkLucro" min="0" step="0.01" value="10" />
+            </label>
+          </div>
+          <div class="row">
+            <label>ISS — local (%)
+              <input type="number" id="mkIss" min="0" step="0.01" value="5" />
+            </label>
+            <label>ICMS — intermunicipal (%)
+              <input type="number" id="mkIcms" min="0" step="0.01" value="7.6" />
+            </label>
+          </div>
+          <p class="readonly-info" id="markupResumo">Divisor: — · Multiplicador: —</p>
         </fieldset>
       </details>
 
@@ -201,19 +266,27 @@
         </p>
 
         <dl class="lines">
-          <dt>Taxa base (caminhão)</dt>
-          <dd id="outTB">R$ 0,00</dd>
-
-          <dt id="lblDeslocamento">Deslocamento</dt>
-          <dd id="outDeslocamento">R$ 0,00</dd>
-
-          <dt>Mão de obra</dt>
-          <dd id="outCMO">R$ 0,00</dd>
+          <dt id="lblVeiculo">Veículo (diária parada + km)</dt>
+          <dd id="outVeiculo">R$ 0,00</dd>
         </dl>
         <ul class="breakdown">
-          <li id="breakMotoristas">—</li>
+          <li id="breakDiariaParada">—</li>
+          <li id="breakKm">—</li>
+        </ul>
+
+        <dl class="lines">
+          <dt>Equipe de entrega</dt>
+          <dd id="outEquipe">R$ 0,00</dd>
+        </dl>
+        <ul class="breakdown">
           <li id="breakAjudantes">—</li>
         </ul>
+
+        <dl class="lines" id="grupoEmbalagem" hidden>
+          <dt>Embalagem antecipada</dt>
+          <dd id="outEmbalagem">R$ 0,00</dd>
+        </dl>
+        <ul class="breakdown" id="breakEmbalagem"></ul>
 
         <dl class="lines">
           <dt>Adicionais</dt>
@@ -222,6 +295,9 @@
         <ul class="breakdown" id="breakAdicionais"></ul>
 
         <dl class="lines">
+          <dt id="lblGris">GRIS</dt>
+          <dd id="outGris">R$ 0,00</dd>
+
           <dt id="lblSeguro">Seguro</dt>
           <dd id="outSeguro">R$ 0,00</dd>
         </dl>
@@ -229,11 +305,11 @@
         <hr />
 
         <dl class="lines">
-          <dt>Subtotal</dt>
-          <dd id="outSubtotal">R$ 0,00</dd>
+          <dt>Custo total</dt>
+          <dd id="outCustoTotal">R$ 0,00</dd>
 
-          <dt id="lblMargem">Margem</dt>
-          <dd id="outMargem">R$ 0,00</dd>
+          <dt id="lblMarkup">Markup</dt>
+          <dd id="outMarkupValor">R$ 0,00</dd>
         </dl>
 
         <hr />
@@ -245,6 +321,11 @@
 
         <p class="reference">
           <strong>Preço por m³ (referência):</strong> <span id="outPorM3">—</span>
+        </p>
+
+        <p class="reference">
+          <strong>Tabela tarifária (referência):</strong> <span id="outTabelaRef">—</span><br/>
+          <small>Valor do manual tarifário para a faixa de km × volume do caminhão sugerido — não entra no cálculo.</small>
         </p>
       </div>
     </aside>

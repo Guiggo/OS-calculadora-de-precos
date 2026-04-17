@@ -1,45 +1,63 @@
 # Calculadora de Orçamento — Mudanças
 
-Ferramenta web estática para cálculo de orçamento de empresa de mudanças. Página única, sem build, recalcula em tempo real.
+Ferramenta web estática para cálculo de orçamento de empresa de mudanças, baseada no manual tarifário "16_Osmar Mudanças" (Fev/2026). Página única, sem build, recalcula em tempo real.
 
 ## Como usar localmente
 
 Abra `index.html` em qualquer navegador (duplo-clique resolve — `file://` funciona). Não precisa de servidor nem de `npm install`.
 
-## Fórmula
+## Modelo de cálculo
 
 ```
-PREÇO_FINAL = (TB + DESLOCAMENTO + CMO + ADICIONAIS + SEGURO) × (1 + MARGEM)
-Preço/m³    = PREÇO_FINAL / V            (referência, não entra no cálculo)
+Custo total =
+    Diária parada × dias                    (veículo + motorista do caminhão selecionado)
+  + Custo/km × D                            (combustível + manutenção)
+  + Ajudantes × dias × R$ 160               (equipe de entrega)
+  + Embalagem antecipada (opcional)         (Chefe + Embaladores × dias + material)
+  + Adicionais                              (içamento, desmontagem, itens especiais, andares)
+  + GRIS                                    (0,3% × valor da mercadoria)
+  + Seguro                                  (2% × valor da mercadoria)
+
+Preço final = Custo total / (1 − Σ%)
+Preço/m³    = Preço final / V               (apenas referência)
 ```
 
-Onde:
+Onde **Σ%** (componentes do markup, editáveis na UI) é:
 
-- **TB**: taxa base do caminhão selecionado (sugerido pelo volume; editável)
-- **DESLOCAMENTO** = `D × CD` (km × R$/km)
-- **CMO** = `dias × (n_motoristas × custo_motorista_dia + n_ajudantes × custo_ajudante_dia)`
-  - CLT: `custo_dia = salário / dias_úteis × multiplicador_encargos`
-  - Terceirizado: `custo_dia = diária`
-- **ADICIONAIS** = içamento + desmontagem + embalagem + adicional_andar + itens_especiais
-  - `adicional_andar = andares × perc_andar × (TB + DESLOCAMENTO + CMO)`
-- **SEGURO** = `VD × S%`
+| Componente | Padrão | Observação |
+|---|---|---|
+| Taxa administrativa | 20% | |
+| Comissões | 3% | |
+| Impostos federais + INSS | 8,23% | Lucro Presumido |
+| Lucro | 10% | lucro líquido real |
+| ISS (local) **ou** ICMS (intermunicipal) | 5% / 7,6% | escolha no dropdown "Modo" |
 
-O volume (**V**, em m³) **não entra no preço**. Ele serve apenas para:
+**Divisores resultantes** (defaults): Local = **1,8598** (≈ custo × 1,86) · Intermunicipal = **1,9543** (≈ custo × 1,95).
 
-1. Sugerir o **caminhão** (faixas de volume editáveis na seção "Caminhão")
-2. Sugerir o **nº de ajudantes** (base 2 + 1 a cada 8 m³, configurável)
+### Por que divisor e não multiplicador?
 
-Ambos podem ser sobrescritos manualmente.
+Porque ISS e ICMS incidem sobre o **preço de venda**, não sobre o custo. Se você multiplicar o custo por 1,25 esperando 10% de lucro, o lucro real será menor — o imposto foi retirado depois. Usando o divisor, o lucro declarado é garantido.
+
+## Papel do volume (m³)
+
+O volume **não compõe o preço diretamente**. Ele:
+
+1. **Sugere o caminhão** (VUC ≤15, TOCO 3/4 ≤30, TOCO ≤45/60, TRUCK ≤75, CARRETA ≤90) — cada um com sua diária parada e custo/km.
+2. **Sugere o nº de ajudantes** (base 2 + 1 a cada 15 m³).
+3. **Sugere a equipe e material de embalagem** quando o serviço está ativo.
+
+Todos os valores podem ser sobrescritos manualmente.
+
+## Comparativo tarifário
+
+O painel exibe o valor de referência do **manual tarifário** (TABELA DIRETA, Fev/2026) para a faixa de km × volume do caminhão sugerido. É só para comparação — não entra no cálculo.
 
 ## Publicação no GitHub Pages
 
-1. Faça merge desta branch na `main`.
-2. No repositório, vá em **Settings → Pages**.
-3. Em **Source**, selecione **Deploy from a branch**, escolha a branch `main` e pasta `/ (root)`.
-4. Salve. A URL pública aparecerá no topo da página após alguns minutos.
+Settings → Pages → Source = "Deploy from a branch" → Branch `main` · pasta `/ (root)` · Save. URL pública sai em ~2 minutos.
 
 ## Arquivos
 
-- `index.html` — markup e formulário
+- `index.html` — formulário e painel de resultado
 - `styles.css` — layout responsivo + estilos de impressão
-- `app.js` — cálculo, formatação em R$ e renderização do recibo
+- `app.js` — cálculo, formatação em R$ e tabela tarifária embutida
