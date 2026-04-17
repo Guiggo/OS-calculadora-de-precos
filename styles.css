@@ -123,19 +123,30 @@ small {
   color: var(--muted);
   font-size: 0.85rem;
 }
+.readonly-info {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #f0f5ff;
+  border: 1px dashed #c8d7ff;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.85rem;
+  min-height: 1.4em;
+}
 
 table.trucks {
   width: 100%;
   border-collapse: collapse;
 }
 table.trucks th, table.trucks td {
-  padding: 6px;
+  padding: 4px;
   text-align: left;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 table.trucks th { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
-table.trucks input { padding: 6px 8px; }
+table.trucks input { padding: 5px 6px; font-size: 0.85rem; }
+table.trucks { display: block; overflow-x: auto; }
 
 .actions {
   display: flex;
